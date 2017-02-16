@@ -1,0 +1,6 @@
+Prototype of WS
+*************************************
+
+POST /hdmiSwitch
+Executes an internal script on windows for pressing the keys Ctrl + Shift + H that switches between HDMI IN on and off
+

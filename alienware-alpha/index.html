@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Alienware Alpha Control Panel</title>
+
+ <link href="/static/css/style.css" rel="stylesheet">
+ <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+ <script type="text/javascript">
+ $(document).ready(function() {        
+
+  $("#switch-hdmi").click(function(e) {
+    $.ajax({
+      type: "POST",
+      url: "/hdmiSwitch"
+    })
+    .done(function(string) {
+      if (string == "ok"){
+        alert("Switch executed");
+      }
+
+    });
+    e.preventDefault();
+  });
+});
+ </script>
+</head>
+<body>
+  <div id="hdmi-in-management">   
+    <table style="width:100%">
+      <tr>
+        <th>Function</th>
+        <th>Control</th>         
+      </tr>
+      <tr>
+        <td>Switch HDMI source</td>
+        <td><button id="switch-hdmi">Switch</button></td>         
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
