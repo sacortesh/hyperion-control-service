@@ -1,0 +1,8 @@
+README
+
+To install this scripts and be able to execute them natively from the pi the following is needed
+
+1. Create script, mark it as executable for all.
+2. Add exception to script in the file visudo
+3. Copy script to proper folder
+4. Modify script to reflect definitive folder

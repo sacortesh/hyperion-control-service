@@ -1,0 +1,47 @@
+import org.openhab.core.library.types.*
+
+var HSBType hsbValue
+var int redValue
+var int greenValue
+var int blueValue
+var String hexValue
+
+rule "Set RGB value"
+when
+        Item AmbilightRGBStrip changed
+then
+        hsbValue = AmbilightRGBStrip.state as HSBType
+
+        redValue   = hsbValue.red.intValue
+        greenValue = hsbValue.green.intValue
+        blueValue  = hsbValue.blue.intValue
+
+        hexValue = String.format("#%02x%02x%02x", redValue, greenValue, blueValue)
+                
+        sendHttpPostRequest("http://192.168.0.98:8080/changeColor/?color="+hexValue)
+end
+
+rule "Set luminance value"
+when
+		Item AmbilightLuminanceDimmer changed
+then
+		var Number percent = 0
+
+		if(AmbilightLuminanceDimmer.state instanceof DecimalType)
+			percent = AmbilightLuminanceDimmer.state as DecimalType
+
+		if(percent>75)
+			percent = 75
+
+		if(percent<0)
+			percent = 0
+
+        sendHttpPostRequest("http://192.168.0.98:8080/changeLuminance/?luminance="+percent)
+end
+
+rule "Clear priority"
+when
+		Item AmbilightPriorityClear changed
+then
+        sendHttpPostRequest("http://192.168.0.98:8080/clearPriority)
+end

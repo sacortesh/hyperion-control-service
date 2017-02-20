@@ -1,0 +1,3 @@
+Color  AmbilightRGBStrip	"RGB Light"
+Dimmer AmbilightLuminanceDimmer "Luminance"
+Switch AmbilightPriorityClear "Clear"

@@ -1,33 +1,16 @@
 import os, os.path
 import random
 import string
+import subprocess
 
 import cherrypy
 
 
-class StringGenerator(object):
+class HyperionServer(object):
     @cherrypy.expose
     def index(self):
         return open('index.html')
 
-
-@cherrypy.expose
-class StringGeneratorWebService(object):
-
-    @cherrypy.tools.accept(media='text/plain')
-    def GET(self):
-        return cherrypy.session['mystring']
-
-    def POST(self, length=8):
-        some_string = ''.join(random.sample(string.hexdigits, int(length)))
-        cherrypy.session['mystring'] = some_string
-        return some_string
-
-    def PUT(self, another_string):
-        cherrypy.session['mystring'] = another_string
-
-    def DELETE(self):
-        cherrypy.session.pop('mystring', None)
 
 @cherrypy.expose
 class HyperionServiceManagementWebService(object):
@@ -50,18 +33,58 @@ class HyperionServiceManagementWebService(object):
         return result
 
 
+@cherrypy.expose
+class HyperionPriorityClearer(object):
+
+    @cherrypy.tools.accept(media='text/plain')    
+    def POST(self):
+        result='ok'
+        subprocess.check_call(['/scripts/clear-priority.sh'])
+        return result
+
+@cherrypy.expose
+class HyperionColorChanger(object):
+
+    @cherrypy.tools.accept(media='text/plain')    
+    def POST(self, color):
+        result='ok'
+        colorString = str(color);
+        subprocess.check_call(['/scripts/color-change.sh', colorString])
+        return result
+
+@cherrypy.expose
+class HyperionLuminanceChanger(object):
+
+    @cherrypy.tools.accept(media='text/plain')    
+    def POST(self, luminance):
+        result='ok'
+        luminanceString = str(luminance);
+        subprocess.check_call(['/scripts/luminance-change.sh', luminanceString])
+        return result
+
+
 if __name__ == '__main__':
     conf = {
         '/': {
             'tools.sessions.on': True,
             'tools.staticdir.root': os.path.abspath(os.getcwd())
-        },
-        '/generator': {
+        },        
+        '/hyperionService': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
             'tools.response_headers.on': True,
             'tools.response_headers.headers': [('Content-Type', 'text/plain')],
         },
-        '/hyperionService': {
+        '/clearPriority': {
+            'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+            'tools.response_headers.on': True,
+            'tools.response_headers.headers': [('Content-Type', 'text/plain')],
+        },
+        '/changeColor': {
+            'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+            'tools.response_headers.on': True,
+            'tools.response_headers.headers': [('Content-Type', 'text/plain')],
+        },
+        '/changeLuminance': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
             'tools.response_headers.on': True,
             'tools.response_headers.headers': [('Content-Type', 'text/plain')],
@@ -71,7 +94,9 @@ if __name__ == '__main__':
             'tools.staticdir.dir': 'public'
         }
     }
-    webapp = StringGenerator()
-    webapp.generator = StringGeneratorWebService()
+    webapp = HyperionServer()
     webapp.hyperionService = HyperionServiceManagementWebService()
+    webapp.clearPriority = HyperionPriorityClearer()
+    webapp.changeColor = HyperionColorChanger()
+    webapp.changeLuminance = HyperionLuminanceChanger()
     cherrypy.quickstart(webapp, '/', conf)
